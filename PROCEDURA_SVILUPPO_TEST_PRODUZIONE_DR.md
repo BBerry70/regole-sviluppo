@@ -93,3 +93,12 @@ Questa disposizione sostituisce il precedente blocco generalizzato delle letture
 - Restano impediti invii email/WhatsApp, scritture esterne e chiamate operative non autorizzate. Predisporre simulazioni consultabili in TEST senza invio reale; nessun invio deve essere mascherato come simulazione.
 - Non cambiare account, configurazioni o permessi PRODUZIONE/DR per comodità. Se mancano account idonei o autorizzazione dall'host TEST, segnalare il blocco prima dell'attivazione e preparare istruzioni amministrative per un account dedicato, senza modificare gli account di produzione.
 - Il collaudo deve verificare le API e i dati delle principali schermate; HTML 200 e /health 200 da soli non costituiscono ripristino funzionale. Riportare separatamente risultati sul candidato TEST e sul servizio effettivamente attivo.
+
+## Eccezione specifica autorizzata CARMA: riuso account — 9 ottobre 2026
+L'utente autorizza esplicitamente Davide per ARCA e richiede acrm_ro anche dall'host TEST.
+Per Davide resta verificata l'assenza di DML/DDL e privilegi amministrativi; l'EXECUTE
+ereditato non viene revocato, ma il client TEST rifiuta EXEC e ogni query diversa
+da SELECT/CTE prima del driver. Non si certifica che il login sia privo di EXECUTE.
+Vtiger: script VTIGER_ENABLE_ACRM_RO_TEST.sql crea soltanto acrm_ro@192.168.1.20
+con la stessa autenticazione dell'account .126 e SELECT su vt75. Non eseguito da Codex.
+Nessun servizio riavviato da questa preparazione.
