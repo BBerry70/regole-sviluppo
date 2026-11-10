@@ -26,6 +26,12 @@ Ogni comando va scritto per questo ambiente, non per una shell Linux.
    solo la shell del server.
 6. **Un comando per blocco**, pronto da copiare, senza prompt iniziale e senza output mescolato.
 7. Nessun comando deve stampare o salvare password, chiavi, token o DSN.
+8. **Non presumere strumenti o copie git sul PC.** `C:\Progetticlaude\<progetto>` non è una copia
+   git del repository. Il codice da portare su un server si consegna come pacchetto già pronto
+   (`.tar.gz`, solo le cartelle necessarie, senza immagini o dati non utili), con la sua impronta
+   SHA256 da verificare prima dell'invio:
+   `(Get-FileHash .\pacchetto.tar.gz -Algorithm SHA256).Hash`.
+   La copia sul server si fa con `scp`; il server non scarica nulla da GitHub.
 
 ## 3. Modello per eseguire uno script di sola lettura su un server
 
@@ -51,3 +57,4 @@ regola che lo evita, così non si ripete.
 | --- | --- | --- | --- |
 | 10/11/2026 | `Operatore '<' riservato per utilizzi futuri` | Redirezione `<` non supportata da PowerShell | §2.1 |
 | 10/11/2026 | `bash: line N: $'\r': command not found` (N = righe dello script + 1) | PowerShell 5.1 aggiunge CRLF in coda alla pipe verso `ssh` | §2.3 |
+| 10/11/2026 | `fatal: not a git repository` su `git fetch` | Presunta una copia git del progetto sul PC dell'utente | §2.8 |
