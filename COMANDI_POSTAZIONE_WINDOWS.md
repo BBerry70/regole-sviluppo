@@ -32,6 +32,15 @@ Ogni comando va scritto per questo ambiente, non per una shell Linux.
    SHA256 da verificare prima dell'invio:
    `(Get-FileHash .\pacchetto.tar.gz -Algorithm SHA256).Hash`.
    La copia sul server si fa con `scp`; il server non scarica nulla da GitHub.
+9. **Niente virgolette doppie dentro il comando remoto di `ssh`.** PowerShell 5.1 toglie le virgolette
+   doppie interne agli argomenti dei programmi esterni: `ssh host 'grep -E ":1|:2"'` arriva al server come
+   `grep -E :1|:2` e bash interpreta `|` come pipe. Il comando remoto tra apici singoli deve contenere solo
+   parole semplici; filtri con spazi, `|`, `;` tra virgolette o espressioni regolari vanno in uno script
+   inviato con la pipe del §3 (anche per i controlli veloci).
+10. **Dire sempre da quale prompt si lancia il comando.** I comandi con `Get-Content`, `Out-File`, `scp` verso
+   il server si lanciano da PowerShell sul PC (prompt `PS C:\PROGETTIClaude\<progetto>>`), mai dentro una
+   sessione ssh aperta sul server (prompt `andrea@...:~$`): bash risponde `syntax error near unexpected token
+   '-replace'`. Se il prompt è quello del server, prima `exit`.
 
 ## 3. Modello per eseguire uno script di sola lettura su un server
 
@@ -58,3 +67,5 @@ regola che lo evita, così non si ripete.
 | 10/11/2026 | `Operatore '<' riservato per utilizzi futuri` | Redirezione `<` non supportata da PowerShell | §2.1 |
 | 10/11/2026 | `bash: line N: $'\r': command not found` (N = righe dello script + 1) | PowerShell 5.1 aggiunge CRLF in coda alla pipe verso `ssh` | §2.3 |
 | 10/11/2026 | `fatal: not a git repository` su `git fetch` | Presunta una copia git del progetto sul PC dell'utente | §2.8 |
+| 11/11/2026 | `bash: line 1: :5433: command not found` e `grep` che mostra tutti i processi | PowerShell 5.1 toglie le virgolette doppie dentro il comando remoto di `ssh` | §2.9 |
+| 11/11/2026 | `-bash: syntax error near unexpected token '-replace'` | Comando PowerShell lanciato dentro una sessione ssh sul server | §2.10 |
