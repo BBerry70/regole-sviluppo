@@ -41,6 +41,11 @@ Ogni comando va scritto per questo ambiente, non per una shell Linux.
    il server si lanciano da PowerShell sul PC (prompt `PS C:\PROGETTIClaude\<progetto>>`), mai dentro una
    sessione ssh aperta sul server (prompt `andrea@...:~$`): bash risponde `syntax error near unexpected token
    '-replace'`. Se il prompt è quello del server, prima `exit`.
+11. **Output dei server in UTF-8.** PowerShell 5.1 legge l'output di `ssh` con la codifica della console
+   (OEM 850): le lettere accentate in UTF-8 diventano coppie come `├á` (per `à`) nel file salvato. Una volta per
+   ogni finestra PowerShell, prima dei comandi, eseguire
+   `[Console]::OutputEncoding = [System.Text.Encoding]::UTF8`. Il dato sul server non è toccato: cambia solo come
+   viene letto l'output.
 
 ## 3. Modello per eseguire uno script di sola lettura su un server
 
@@ -69,3 +74,4 @@ regola che lo evita, così non si ripete.
 | 10/11/2026 | `fatal: not a git repository` su `git fetch` | Presunta una copia git del progetto sul PC dell'utente | §2.8 |
 | 11/11/2026 | `bash: line 1: :5433: command not found` e `grep` che mostra tutti i processi | PowerShell 5.1 toglie le virgolette doppie dentro il comando remoto di `ssh` | §2.9 |
 | 11/11/2026 | `-bash: syntax error near unexpected token '-replace'` | Comando PowerShell lanciato dentro una sessione ssh sul server | §2.10 |
+| 12/11/2026 | `SOCIET├á` invece di `SOCIETÀ`/`SOCIETà` nel file di output | PowerShell 5.1 decodifica l'output di `ssh` con la codifica OEM della console | §2.11 |
