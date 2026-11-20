@@ -27,8 +27,8 @@ ops_carica_ambienti() {
   OPS_PROGETTO_DIR="$progetto_dir"
 }
 
-# Codice HTTP di un URL (vuoto se non risponde entro il timeout).
-ops_http() { curl -s -o /dev/null -m "${2:-8}" -w '%{http_code}' "$1" 2>/dev/null; }
+# Codice HTTP di un URL (vuoto se non risponde entro il timeout, 15 s: il /api/health di Delivery Planner TEST ne impiega ~10).
+ops_http() { curl -s -o /dev/null -m "${2:-15}" -w '%{http_code}' "$1" 2>/dev/null; }
 
 # Stato di un servizio systemd locale.
 ops_servizio_locale() { systemctl is-active "$1" 2>/dev/null || true; }
