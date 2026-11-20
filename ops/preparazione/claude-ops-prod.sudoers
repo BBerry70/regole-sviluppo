@@ -1,0 +1,5 @@
+# /etc/sudoers.d/claude-ops sul server di PRODUZIONE (192.168.1.126) — deroga D1 (CLAUDE_CODE_SERVER_TEST.md §6.2).
+# Solo script root:root 0755 in /usr/local/sbin, senza argomenti. Ogni uso richiede l'approvazione esplicita
+# dell'utente per quel rilascio (D3) e la conferma in Claude Code.
+claude ALL=(root) NOPASSWD: /usr/local/sbin/carma-prod-rilascio ""
+claude ALL=(root) NOPASSWD: /usr/local/sbin/carma-prod-rollback ""
