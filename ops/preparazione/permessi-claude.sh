@@ -8,6 +8,7 @@
 #  2. CARMA TEST: lettura e scrittura su /opt/test/acrm/app e /opt/test/acrm/backups (per test-applica.sh);
 #     i file segreti (.env*, db_config.json) restano esclusi;
 #  3. Delivery Planner TEST e DR: sola lettura del codice installato (per stato.sh);
+#  3b. CARMA DR (/opt/acrm/app): sola lettura per il gruppo carma-test (stato.sh, dr-aggiorna.sh), segreti esclusi;
 #  4. copia canonica della procedura: aggiunge la deroga alla regola 8 (D1) prendendo il testo da regole-sviluppo;
 #  5. solo con --chiudi-env-backup: porta a 600 le copie di backup di .env leggibili da tutti in TEST e DR.
 # Non crea /etc/sudoers.d/claude-ops: arriverà con gli script di rilascio approvati.
@@ -40,6 +41,11 @@ for base in /opt/test/delivery-planner /opt/delivery-planner; do
   setfacl -R -m g:dp-test:rX -m d:g:dp-test:rX "$cur"
   segreti "$cur" | xargs -0 -r setfacl -x g:dp-test
 done
+
+echo "3b. CARMA DR: sola lettura (gruppo carma-test)"
+setfacl -m g:carma-test:rX /opt/acrm
+setfacl -R -m g:carma-test:rX -m d:g:carma-test:rX /opt/acrm/app
+segreti /opt/acrm/app | xargs -0 -r setfacl -x g:carma-test
 
 echo "4. Procedura canonica: deroga D1 alla regola 8"
 CAN=/opt/test/PROCEDURA_SVILUPPO_TEST_PRODUZIONE_DR.md
