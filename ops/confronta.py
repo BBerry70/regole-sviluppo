@@ -16,7 +16,7 @@ import subprocess
 import sys
 
 
-def blob_del_riferimento(repo, ref, escludi):
+def blob_del_riferimento(repo, ref, escludi, solo=()):
     out = subprocess.run(
         ["git", "-C", repo, "ls-tree", "-r", "-z", ref],
         check=True, capture_output=True,
@@ -31,6 +31,8 @@ def blob_del_riferimento(repo, ref, escludi):
         if tipo != b"blob" or modo == b"120000":
             continue
         if any(p.startswith(e) for e in escludi):
+            continue
+        if solo and not any(p == s or p.startswith(s.rstrip("/") + "/") for s in solo):
             continue
         voci[p] = oid.decode()
     # sha256 dei blob con un solo processo git cat-file --batch
@@ -60,8 +62,9 @@ def hash_installati(cartella, percorsi, ssh, senza_cr=False):
         calcolo = ("while IFS= read -r -d '' f; do "
                    "printf '%s  %s\\n' \"$(sed 's/\\r$//' -- \"$f\" | sha256sum | cut -d' ' -f1)\" \"$f\"; done")
     script = (
-        "cd -- \"$1\" || exit 2; "
-        "while IFS= read -r -d '' f; do [ -f \"$f\" ] && [ -r \"$f\" ] && printf '%s\\0' \"$f\"; done "
+        "cd -- \"$1\" || exit 2; exec 3>&1; "
+        "while IFS= read -r -d '' f; do [ -f \"$f\" ] || continue; "
+        "if [ -r \"$f\" ]; then printf '%s\\0' \"$f\"; else printf 'NONLEGGIBILE  %s\\n' \"$f\" >&3; fi; done "
         "| " + calcolo
     )
     comando = ["bash", "-c", script, "confronta", cartella]
@@ -88,14 +91,18 @@ def main():
     a.add_argument("--dir", required=True)
     a.add_argument("--ssh")
     a.add_argument("--escludi", action="append", default=[])
+    a.add_argument("--solo", action="append", default=[],
+                   help="confronta solo questi percorsi (file o cartelle del repository)")
     a.add_argument("--elenco", type=int, default=20)
     a.add_argument("--etichetta", default="")
     x = a.parse_args()
 
-    attesi = blob_del_riferimento(x.repo, x.ref, x.escludi)
+    attesi = blob_del_riferimento(x.repo, x.ref, x.escludi, x.solo)
     installati = hash_installati(x.dir, list(attesi), x.ssh)
+    non_leggibili = sorted(p for p, h in installati.items() if h == "NONLEGGIBILE")
+    installati = {p: h for p, h in installati.items() if h != "NONLEGGIBILE"}
     diversi = sorted(p for p, h in installati.items() if attesi.get(p) != h)
-    mancanti = sorted(p for p in attesi if p not in installati)
+    mancanti = sorted(p for p in attesi if p not in installati and p not in non_leggibili)
     uguali = len(installati) - len(diversi)
     # Seconda passata sui soli diversi: quelli uguali a meno dei fine riga CRLF non sono modifiche.
     solo_fine_riga = []
@@ -107,12 +114,15 @@ def main():
     etichetta = x.etichetta or x.dir
     print(f"{etichetta}: confronto con {x.ref}: {uguali} uguali, "
           f"{len(solo_fine_riga)} uguali salvo fine riga CRLF, {len(diversi)} diversi, "
-          f"{len(mancanti)} assenti nella cartella")
+          f"{len(mancanti)} assenti nella cartella"
+          + (f", {len(non_leggibili)} NON LEGGIBILI" if non_leggibili else ""))
+    for p in non_leggibili[: x.elenco]:
+        print(f"  non leggibile: {p}")
     for p in diversi[: x.elenco]:
         print(f"  diverso: {p}")
     if len(diversi) > x.elenco:
         print(f"  … altri {len(diversi) - x.elenco} file diversi")
-    return 1 if diversi else 0
+    return 1 if diversi or non_leggibili else 0
 
 
 if __name__ == "__main__":

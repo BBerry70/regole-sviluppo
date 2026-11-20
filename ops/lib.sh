@@ -52,6 +52,8 @@ ops_confronta() {
   local args=(--repo "$OPS_PROGETTO_DIR" --ref "$ref" --dir "$dir" --etichetta "$etichetta")
   local e
   for e in ${CONFRONTO_ESCLUDI:-}; do args+=(--escludi "$e"); done
+  for e in ${CONFRONTO_SOLO:-}; do args+=(--solo "$e"); done
+  [ -n "${CONFRONTO_ELENCO:-}" ] && args+=(--elenco "$CONFRONTO_ELENCO")
   [ -n "$ssh" ] && args+=(--ssh "$ssh")
   python3 -I "$OPS_LIB_DIR/confronta.py" "${args[@]}"
 }
