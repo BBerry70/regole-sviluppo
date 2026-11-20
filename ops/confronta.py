@@ -52,12 +52,17 @@ def blob_del_riferimento(repo, ref, escludi):
     return hash_attesi
 
 
-def hash_installati(cartella, percorsi, ssh):
+def hash_installati(cartella, percorsi, ssh, senza_cr=False):
     # sha256sum sui soli file esistenti; i nomi passano su stdin separati da NUL.
+    # Con senza_cr=True l'impronta è calcolata togliendo i CR di fine riga (CRLF -> LF).
+    calcolo = "xargs -0 -r sha256sum --"
+    if senza_cr:
+        calcolo = ("while IFS= read -r -d '' f; do "
+                   "printf '%s  %s\\n' \"$(sed 's/\\r$//' -- \"$f\" | sha256sum | cut -d' ' -f1)\" \"$f\"; done")
     script = (
         "cd -- \"$1\" || exit 2; "
         "while IFS= read -r -d '' f; do [ -f \"$f\" ] && [ -r \"$f\" ] && printf '%s\\0' \"$f\"; done "
-        "| xargs -0 -r sha256sum --"
+        "| " + calcolo
     )
     comando = ["bash", "-c", script, "confronta", cartella]
     if ssh:
@@ -92,9 +97,16 @@ def main():
     diversi = sorted(p for p, h in installati.items() if attesi.get(p) != h)
     mancanti = sorted(p for p in attesi if p not in installati)
     uguali = len(installati) - len(diversi)
+    # Seconda passata sui soli diversi: quelli uguali a meno dei fine riga CRLF non sono modifiche.
+    solo_fine_riga = []
+    if diversi:
+        senza_cr = hash_installati(x.dir, diversi, x.ssh, senza_cr=True)
+        solo_fine_riga = [p for p in diversi if senza_cr.get(p) == attesi[p]]
+        diversi = [p for p in diversi if p not in solo_fine_riga]
 
     etichetta = x.etichetta or x.dir
-    print(f"{etichetta}: confronto con {x.ref}: {uguali} uguali, {len(diversi)} diversi, "
+    print(f"{etichetta}: confronto con {x.ref}: {uguali} uguali, "
+          f"{len(solo_fine_riga)} uguali salvo fine riga CRLF, {len(diversi)} diversi, "
           f"{len(mancanti)} assenti nella cartella")
     for p in diversi[: x.elenco]:
         print(f"  diverso: {p}")
