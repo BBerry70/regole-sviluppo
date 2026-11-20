@@ -188,3 +188,16 @@ diretto come `claude` con una chiave del PC, se preferito).
    della procedura sul server (`/opt/test/PROCEDURA_SVILUPPO_TEST_PRODUZIONE_DR.md`) con la deroga alla regola 8;
 6. collaudo: `test-applica.sh` + `test-verifica.sh` sul `main` attuale di CARMA, poi un piccolo rilascio
    reale con la procedura completa.
+
+## 11. Stato della preparazione (20/11/2026)
+
+| Passo | Stato |
+| --- | --- |
+| 1. Clone e mappa ambienti | Fatto: `~/lavoro/CARMA`, `~/lavoro/delivery-planner`, `ops/ambienti.env` in entrambi (PR sui progetti) |
+| 2. Gruppi e permessi | Script pronto: `ops/preparazione/permessi-claude.sh`, da lanciare dall'utente con sudo. `claude-ops` rimandato agli script di rilascio |
+| 3. Script `ops/` | Fatti `lib.sh`, `confronta.py`, `stato.sh` (solo lettura). Da fare: `test-applica`, `test-verifica`, `prod-rilascio`, `prod-rollback`, `dr-aggiorna` |
+| 4. `~/.claude/` | Installati `CLAUDE.md`, `settings.json`, skill `/allineamento` e `/modifica` (sorgenti in `claude/`). `/rilascio` e `/dr` con gli script di rilascio |
+| 5. `AGENTS.md` e procedura canonica | PR su CARMA e Delivery Planner; deroga D1 sulla copia canonica tramite lo script del passo 2 |
+| 6. Collaudo | Dopo i passi 2 e 3 |
+
+Bloccanti: permessi del passo 2; chiave ssh di `claude` e utente dedicato su PRODUZIONE (§6.3), da decidere.
