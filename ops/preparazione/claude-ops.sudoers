@@ -2,3 +2,4 @@
 # Solo script root:root 0755 in /usr/local/sbin, per percorso assoluto, senza argomenti, senza caratteri jolly.
 # Ogni aggiunta passa da una PR approvata e da un'installazione fatta dall'utente con la propria password.
 claude ALL=(root) NOPASSWD: /usr/local/sbin/carma-test-riavvia ""
+claude ALL=(root) NOPASSWD: /usr/local/sbin/carma-dr-aggiorna ""
