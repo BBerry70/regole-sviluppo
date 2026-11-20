@@ -29,7 +29,7 @@ Questa precisazione non autorizza invii, scritture o attivazione generalizzata d
 5. I dati PRODUZIONE possono essere copiati in TEST soltanto con autorizzazione e modalità di lettura dalla produzione. Preservare i dati TEST esistenti con backup e gestione dei conflitti. Mai TEST → PRODUZIONE per dati applicativi.
 6. Nessun rilascio in PRODUZIONE senza approvazione esplicita dell'utente, backup verificato, piano di rollback e controllo dei prerequisiti.
 7. DR replica la versione **approvata e funzionante** in PRODUZIONE, non il codice in lavorazione TEST. DR non deve attivare automazioni o doppie scritture prima di un failover autorizzato.
-8. Non mostrare né copiare nei log password, token, chiavi private o contenuti integrali dei file di configurazione. Non attivare sudo senza password per comodità.
+8. Non mostrare né copiare nei log password, token, chiavi private o contenuti integrali dei file di configurazione. Non attivare sudo senza password per comodità. Unica deroga (20/11/2026): l'utente di sistema `claude` può eseguire senza password i soli script di rilascio root non modificabili elencati in `/etc/sudoers.d/claude-ops`, come descritto in `CLAUDE_CODE_SERVER_TEST.md` §6.2 del repository regole-sviluppo.
 9. Non usare comandi distruttivi, `rsync --delete`, migrazioni irreversibili o sostituzioni di database senza backup, verifica di impatto e autorizzazione quando necessaria.
 
 ## Flusso di lavoro Codex
