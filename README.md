@@ -9,6 +9,7 @@ Valgono per tutte le persone e per tutti gli agenti (Codex, Claude Code) che lav
 | --- | --- |
 | [PROCEDURA_SVILUPPO_TEST_PRODUZIONE_DR.md](PROCEDURA_SVILUPPO_TEST_PRODUZIONE_DR.md) | Procedura v1.2 TEST → PRODUZIONE → DR (9 ottobre 2026) |
 | [REGOLE_AGENTI.md](REGOLE_AGENTI.md) | Come lavorano insieme Codex e Claude: rami, pull request, tag, segreti |
+| [CLAUDE_CODE_SERVER_TEST.md](CLAUDE_CODE_SERVER_TEST.md) | Bozza: Claude Code sul server TEST, script `ops/`, permessi, skill e avvio |
 | [modelli/AGENTS_INTESTAZIONE.md](modelli/AGENTS_INTESTAZIONE.md) | Intestazione comune da mettere in cima all'`AGENTS.md` di ogni progetto |
 | [modelli/CLAUDE.md](modelli/CLAUDE.md) | `CLAUDE.md` da copiare in ogni progetto: rimanda ad `AGENTS.md` |
 
