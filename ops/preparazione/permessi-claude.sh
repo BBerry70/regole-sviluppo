@@ -10,8 +10,10 @@
 #  3. Delivery Planner TEST e DR: sola lettura del codice installato (per stato.sh);
 #  3b. CARMA DR (/opt/acrm/app): sola lettura per il gruppo carma-test (stato.sh, dr-aggiorna.sh), segreti esclusi;
 #  4. copia canonica della procedura: aggiunge la deroga alla regola 8 (D1) prendendo il testo da regole-sviluppo;
-#  6. /opt/test/claude-verifiche: cartella di lavoro di claude per i controlli obbligatori di Delivery Planner,
-#     che rifiutano di girare fuori da /opt/test (test-verifica.sh);
+#  6. /opt/test/operations/claude-verifiche: cartella di lavoro di claude per i controlli obbligatori di
+#     Delivery Planner (test-verifica.sh): girano solo sotto /opt/test/, e il collaudo PostgreSQL V2
+#     (check_preparations_v2.py) solo sotto /opt/test/operations; il progetto usa la sottocartella corta dp/
+#     (socket PostgreSQL sotto i 100 caratteri), che crea da sé;
 #  5. solo con --chiudi-env-backup: porta a 600 le copie di backup di .env leggibili da tutti in TEST e DR.
 # Non crea /etc/sudoers.d/claude-ops: arriverà con gli script di rilascio approvati.
 set -euo pipefail
@@ -74,8 +76,7 @@ if [ "$CHIUDI_ENV" = 1 ]; then
 fi
 
 echo "6. Cartella di lavoro per le verifiche di TEST"
-install -d -o claude -g claude -m 0750 /opt/test/claude-verifiche
-install -d -o claude -g claude -m 0750 /opt/test/claude-verifiche/delivery-planner
+install -d -o claude -g claude -m 0750 /opt/test/operations/claude-verifiche
 
 echo
 echo "Fatto. L'utente claude deve aprire una nuova sessione (sudo -iu claude) perché i gruppi abbiano effetto."
