@@ -1,6 +1,6 @@
 ---
 name: rilascio
-description: Rilascio in PRODUZIONE e poi DR di una PR già collaudata in TEST (CARMA; Delivery Planner quando avrà gli script ops/ di rilascio), subito o a un orario indicato. Usare SOLO dopo che l'utente ha scritto «approvo il rilascio di prod-AAAAMMGG» (o «approvo il rilascio» riferito a una PR precisa) in questa conversazione.
+description: Rilascio in PRODUZIONE e poi DR di una PR già collaudata in TEST (CARMA e Delivery Planner), subito o a un orario indicato. Usare SOLO dopo che l'utente ha scritto «approvo il rilascio di prod-AAAAMMGG» (o «approvo il rilascio» riferito a una PR precisa) in questa conversazione.
 ---
 
 Decisione D3: una sola approvazione esplicita copre merge, tag, PRODUZIONE e DR di **quel** rilascio. Non vale
@@ -16,7 +16,8 @@ per altre PR, altri tag o altri giorni. Senza la frase di approvazione: fermarsi
 ## 1. Controlli prima del merge (sola lettura)
 - `gh pr view <n> --json state,mergeable,headRefOid,baseRefName,files`: aperta, verso `main`, senza conflitti.
 - Collaudo in TEST: `ops/test-verifica.sh` verde sullo stesso codice della PR (il commit applicato è in
-  `<TEST_DIR>/.claude-applicato.json`). Se manca o è vecchio: `ops/test-applica.sh <ramo>` + `ops/test-verifica.sh`.
+  `<TEST_DIR>/.claude-applicato.json`). Per Delivery Planner comprende i controlli obbligatori di `AGENTS.md`
+  (`check_stock_reservations.py`, `check_trip_addresses.py`): se falliscono non si rilascia. Se manca o è vecchio: `ops/test-applica.sh <ramo>` + `ops/test-verifica.sh`.
 - Migrazioni: se la PR aggiunge o cambia file delle migrazioni (`TEST_MIGRAZIONI` in `ops/ambienti.env`),
   gli script di rilascio non le eseguono. Fermarsi e chiedere all'utente di applicarle al database di
   PRODUZIONE; proseguire con `--migrazioni-applicate` solo dopo la sua conferma scritta.
