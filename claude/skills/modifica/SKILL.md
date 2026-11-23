@@ -11,5 +11,8 @@ description: Dalla richiesta dell'utente alla pull request per CARMA o Delivery 
    Se questi script non esistono ancora, fermarsi e dirlo all'utente: non copiare file in TEST a mano.
 5. Aprire la PR verso `main` con: cosa cambia, test eseguiti con esito, verifica in TEST, rischi, rollback
    (REGOLE_AGENTI §4).
-6. Chiudere con «pronto per il rilascio» e il riepilogo da approvare. Non unire la PR e non creare tag:
-   servono l'approvazione esplicita e la skill /rilascio.
+6. Se la modifica aggiunge o cambia migrazioni del database: applicarle in TEST e dirlo nella PR; per la
+   PRODUZIONE gli script di rilascio non le eseguono, quindi segnalarle nel riepilogo come passo dell'utente.
+7. Chiudere con «pronto per il rilascio» e il riepilogo da approvare: PR, tag proposto
+   (`prod-AAAAMMGG`), file che cambiano, migrazioni, rischi. Non unire la PR e non creare tag: dopo
+   «approvo il rilascio di prod-AAAAMMGG» (anche con un orario) si procede con la skill `/rilascio`.

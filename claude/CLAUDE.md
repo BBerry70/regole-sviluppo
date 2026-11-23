@@ -25,4 +25,8 @@ regole-sviluppo, poi ricopiarlo in `~/.claude/CLAUDE.md`.
 
 ## Comandi
 - Stato di un progetto (solo lettura): `~/lavoro/<progetto>/ops/stato.sh`
-- Skill: `/allineamento` (stato di tutti i progetti), `/modifica` (dalla richiesta alla PR).
+- Skill: `/allineamento` (stato di tutti i progetti), `/modifica` (dalla richiesta alla PR),
+  `/rilascio` (dopo «approvo il rilascio di prod-AAAAMMGG»: merge, tag, PRODUZIONE, DR, scheda),
+  `/dr` (solo DR, su richiesta).
+- Rilascio a un orario (ora italiana): `~/lavoro/regole-sviluppo/ops/rilascio-pianificato.sh pianifica|elenco|annulla`.
+- I server possono non essere in ora italiana: per gli orari all'utente usare sempre `TZ=Europe/Rome`.

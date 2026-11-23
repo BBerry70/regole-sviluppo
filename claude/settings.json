@@ -20,6 +20,8 @@
       "Bash(gh pr diff*)",
       "Bash(gh pr checks*)",
       "Bash(gh release list*)",
+      "Bash(gh release view*)",
+      "Bash(*/ops/rilascio-pianificato.sh elenco*)",
       "Bash(gh repo clone BBerry70/*)",
       "Bash(python3 -m pytest*)",
       "Bash(pytest*)",
@@ -45,6 +47,8 @@
       "Bash(git push --tags*)",
       "Bash(git push origin prod-*)",
       "Bash(gh release create*)",
+      "Bash(*/ops/rilascio-pianificato.sh pianifica*)",
+      "Bash(*/ops/rilascio-pianificato.sh annulla*)",
       "Bash(systemctl restart *)",
       "Bash(systemctl start *)",
       "Bash(systemctl stop *)"
