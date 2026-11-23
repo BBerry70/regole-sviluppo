@@ -121,13 +121,16 @@ claude ALL=(root) NOPASSWD: /usr/local/sbin/carma-prod-rilascio, /usr/local/sbin
 
 ## 7. Skill (procedure richiamabili)
 
-Stanno in `regole-sviluppo/skills/` e si installano in `~/.claude/skills/`.
+Stanno in `regole-sviluppo/claude/skills/` e si installano in `~/.claude/skills/`.
 
 - **/modifica** — dalla richiesta dell'utente alla PR: ramo `claude/<tema>-<data>`, sviluppo,
   `test-applica.sh`, `test-verifica.sh`, PR con test e rischi (REGOLE_AGENTI §4). Si ferma con «pronto per il
   rilascio» e il riepilogo da approvare.
 - **/rilascio** — solo dopo approvazione esplicita: merge della PR, tag `prod-AAAAMMGG`, `prod-rilascio.sh`,
-  verifica, scheda di rilascio, poi `dr-aggiorna.sh`. In caso di errore: rollback e rapporto.
+  verifica, poi `dr-aggiorna.sh` e PR della scheda di rilascio. In caso di errore: rollback e rapporto.
+  Con un orario indicato dall'utente (ora italiana) il rilascio si pianifica con
+  `ops/rilascio-pianificato.sh pianifica <progetto> <tag> "<AAAA-MM-GG HH:MM>"`, che usa il crontab di
+  `claude`, converte l'orario nel fuso del server e scrive il log in `~/ops-pianificati/`.
 - **/dr** — aggiornamento DR separato, quando serve.
 - **/allineamento** — `stato.sh` su tutti i progetti: segnala differenze tra GitHub, TEST, PRODUZIONE e DR e
   propone come risolverle.
@@ -189,15 +192,17 @@ diretto come `claude` con una chiave del PC, se preferito).
 6. collaudo: `test-applica.sh` + `test-verifica.sh` sul `main` attuale di CARMA, poi un piccolo rilascio
    reale con la procedura completa.
 
-## 11. Stato della preparazione (20/11/2026)
+## 11. Stato della preparazione (23/11/2026)
 
 | Passo | Stato |
 | --- | --- |
-| 1. Clone e mappa ambienti | Fatto: `~/lavoro/CARMA`, `~/lavoro/delivery-planner`, `ops/ambienti.env` in entrambi (PR sui progetti) |
-| 2. Gruppi e permessi | Script pronto: `ops/preparazione/permessi-claude.sh`, da lanciare dall'utente con sudo. `claude-ops` rimandato agli script di rilascio |
-| 3. Script `ops/` | Fatti `lib.sh`, `confronta.py`, `stato.sh` (solo lettura). Da fare: `test-applica`, `test-verifica`, `prod-rilascio`, `prod-rollback`, `dr-aggiorna` |
-| 4. `~/.claude/` | Installati `CLAUDE.md`, `settings.json`, skill `/allineamento` e `/modifica` (sorgenti in `claude/`). `/rilascio` e `/dr` con gli script di rilascio |
-| 5. `AGENTS.md` e procedura canonica | PR su CARMA e Delivery Planner; deroga D1 sulla copia canonica tramite lo script del passo 2 |
-| 6. Collaudo | Dopo i passi 2 e 3 |
+| 1. Clone e mappa ambienti | Fatto: `~/lavoro/CARMA`, `~/lavoro/delivery-planner`, `ops/ambienti.env` in entrambi |
+| 2. Gruppi e permessi | Fatto: gruppi `carma-test`/`dp-test` con ACL, lettura DR CARMA, deroga D1; utente `claude` in PRODUZIONE con chiave dedicata (§6.3) |
+| 3. Script `ops/` | CARMA completo: `stato`, `test-applica`, `test-verifica`, `prod-rilascio`, `prod-rollback`, `dr-aggiorna` e script root in `ops/sbin/` installati con le regole sudo su TEST/DR e PRODUZIONE. Delivery Planner: solo `stato.sh` |
+| 4. `~/.claude/` | Installati `CLAUDE.md`, `settings.json`, skill `/allineamento`, `/modifica`, `/rilascio`, `/dr` (sorgenti in `claude/`); rilasci a orario con `ops/rilascio-pianificato.sh` |
+| 5. `AGENTS.md` e procedura canonica | Fatto per CARMA e Delivery Planner |
+| 6. Collaudo | CARMA: TEST su `main` verde (20/11); rilascio reale `prod-20261120` in PRODUZIONE e DR il 20/11 alle 17:45, pianificato in assenza dell'utente, riuscito |
 
-Bloccanti: permessi del passo 2; chiave ssh di `claude` e utente dedicato su PRODUZIONE (§6.3), da decidere.
+Da fare: script `ops/` di rilascio per Delivery Planner; decisione su come applicare le migrazioni del
+database (oggi le applica l'utente; gli script usano `--migrazioni-applicate`); fusi orari dei server
+(192.168.1.20 è in UTC) da portare a Europe/Rome.
