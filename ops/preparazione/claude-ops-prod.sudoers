@@ -3,3 +3,6 @@
 # dell'utente per quel rilascio (D3) e la conferma in Claude Code.
 claude ALL=(root) NOPASSWD: /usr/local/sbin/carma-prod-rilascio ""
 claude ALL=(root) NOPASSWD: /usr/local/sbin/carma-prod-rollback ""
+# Delivery Planner: script senza argomenti che lanciano /usr/local/sbin/dp-rilascio-motore (non elencato qui).
+claude ALL=(root) NOPASSWD: /usr/local/sbin/dp-prod-rilascio ""
+claude ALL=(root) NOPASSWD: /usr/local/sbin/dp-prod-rollback ""

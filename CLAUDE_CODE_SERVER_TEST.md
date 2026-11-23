@@ -198,11 +198,13 @@ diretto come `claude` con una chiave del PC, se preferito).
 | --- | --- |
 | 1. Clone e mappa ambienti | Fatto: `~/lavoro/CARMA`, `~/lavoro/delivery-planner`, `ops/ambienti.env` in entrambi |
 | 2. Gruppi e permessi | Fatto: gruppi `carma-test`/`dp-test` con ACL, lettura DR CARMA, deroga D1; utente `claude` in PRODUZIONE con chiave dedicata (§6.3) |
-| 3. Script `ops/` | CARMA completo: `stato`, `test-applica`, `test-verifica`, `prod-rilascio`, `prod-rollback`, `dr-aggiorna` e script root in `ops/sbin/` installati con le regole sudo su TEST/DR e PRODUZIONE. Delivery Planner: solo `stato.sh` |
+| 3. Script `ops/` | CARMA completo: `stato`, `test-applica`, `test-verifica`, `prod-rilascio`, `prod-rollback`, `dr-aggiorna` e script root in `ops/sbin/` installati con le regole sudo su TEST/DR e PRODUZIONE. Delivery Planner: stessi script (versioni in cartelle `releases/` con collegamento `current`, motore unico `dp-rilascio-motore`), da installare (`ops/sbin/README.md` del progetto) |
 | 4. `~/.claude/` | Installati `CLAUDE.md`, `settings.json`, skill `/allineamento`, `/modifica`, `/rilascio`, `/dr` (sorgenti in `claude/`); rilasci a orario con `ops/rilascio-pianificato.sh` |
 | 5. `AGENTS.md` e procedura canonica | Fatto per CARMA e Delivery Planner |
 | 6. Collaudo | CARMA: TEST su `main` verde (20/11); rilascio reale `prod-20261120` in PRODUZIONE e DR il 20/11 alle 17:45, pianificato in assenza dell'utente, riuscito |
 
-Da fare: script `ops/` di rilascio per Delivery Planner; decisione su come applicare le migrazioni del
-database (oggi le applica l'utente; gli script usano `--migrazioni-applicate`); fusi orari dei server
-(192.168.1.20 è in UTC) da portare a Europe/Rome.
+Migrazioni del database: le applica l'utente (decisione del 23/11/2026); gli script si fermano e poi
+proseguono con `--migrazioni-applicate`.
+
+Da fare: installazione e collaudo degli script di Delivery Planner; fusi orari dei server (192.168.1.20 è
+in UTC) da portare a Europe/Rome.

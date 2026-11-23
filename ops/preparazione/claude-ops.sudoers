@@ -3,3 +3,7 @@
 # Ogni aggiunta passa da una PR approvata e da un'installazione fatta dall'utente con la propria password.
 claude ALL=(root) NOPASSWD: /usr/local/sbin/carma-test-riavvia ""
 claude ALL=(root) NOPASSWD: /usr/local/sbin/carma-dr-aggiorna ""
+# Delivery Planner: script senza argomenti che lanciano /usr/local/sbin/dp-rilascio-motore (non elencato qui).
+claude ALL=(root) NOPASSWD: /usr/local/sbin/dp-test-attiva ""
+claude ALL=(root) NOPASSWD: /usr/local/sbin/dp-test-ripristina ""
+claude ALL=(root) NOPASSWD: /usr/local/sbin/dp-dr-aggiorna ""
