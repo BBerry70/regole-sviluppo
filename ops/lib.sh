@@ -47,6 +47,7 @@ ops_ultimo_tag_prod() {
 
 # Confronto file per file tra un riferimento git e una cartella installata (locale o via ssh).
 # Uso: ops_confronta <ref> <cartella> <etichetta> [utente@host]
+# CONFRONTO_OVERLAY=<cartella del repo>: i suoi file sostituiscono quelli attesi (adattamenti TEST).
 ops_confronta() {
   local ref="$1" dir="$2" etichetta="$3" ssh="${4:-}"
   local args=(--repo "$OPS_PROGETTO_DIR" --ref "$ref" --dir "$dir" --etichetta "$etichetta")
@@ -54,6 +55,7 @@ ops_confronta() {
   for e in ${CONFRONTO_ESCLUDI:-}; do args+=(--escludi "$e"); done
   for e in ${CONFRONTO_SOLO:-}; do args+=(--solo "$e"); done
   [ -n "${CONFRONTO_ELENCO:-}" ] && args+=(--elenco "$CONFRONTO_ELENCO")
+  [ -n "${CONFRONTO_OVERLAY:-}" ] && args+=(--overlay "$CONFRONTO_OVERLAY")
   [ -n "$ssh" ] && args+=(--ssh "$ssh")
   python3 -I "$OPS_LIB_DIR/confronta.py" "${args[@]}"
 }

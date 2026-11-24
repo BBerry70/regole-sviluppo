@@ -17,7 +17,8 @@ ops_titolo "TEST ($TEST_DIR)"
 s="$(ops_servizio_locale "$TEST_SERVIZIO")"; [ "$s" = active ] && ops_ok "servizio $TEST_SERVIZIO: $s" || { ops_warn "servizio $TEST_SERVIZIO: $s"; esito=1; }
 c="$(ops_http "$TEST_URL_SALUTE")"; [ "$c" = 200 ] && ops_ok "salute $TEST_URL_SALUTE: $c" || { ops_warn "salute $TEST_URL_SALUTE: ${c:-nessuna risposta}"; esito=1; }
 if [ -r "$TEST_DIR" ] && [ -x "$TEST_DIR" ]; then
-  ops_confronta origin/main "$TEST_DIR" "TEST vs main" || esito=1
+  # Gli adattamenti di TEST salvati su GitHub (TEST_OVERLAY, es. CARMA) non sono differenze.
+  CONFRONTO_OVERLAY="${TEST_OVERLAY:-}" ops_confronta origin/main "$TEST_DIR" "TEST vs main" || esito=1
 else
   ops_warn "cartella TEST non leggibile dall'utente $(id -un): servono i permessi di gruppo (preparazione §10 passo 2)"; esito=1
 fi
