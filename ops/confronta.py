@@ -5,6 +5,10 @@ Solo lettura. La cartella può essere locale o su un host remoto raggiunto via s
 Uso:
   confronta.py --repo DIR --ref prod-20261120 --dir /opt/acrm/app [--ssh utente@host]
                [--prefisso src/] [--escludi doc/ --escludi tests/] [--elenco 20]
+               [--overlay ambienti/test/overlay]
+
+--overlay: i file sotto quella cartella del riferimento sostituiscono, con il percorso senza il prefisso,
+quelli attesi nella cartella installata (adattamenti di TEST salvati su GitHub, es. CARMA).
 
 Esito: 0 se tutti i file presenti in entrambi coincidono, 1 se ci sono differenze, 2 per errore.
 I file del riferimento assenti nella cartella sono contati a parte (spesso documentazione non installata).
@@ -94,10 +98,19 @@ def main():
     a.add_argument("--solo", action="append", default=[],
                    help="confronta solo questi percorsi (file o cartelle del repository)")
     a.add_argument("--elenco", type=int, default=20)
+    a.add_argument("--overlay", default="",
+                   help="cartella del repository i cui file sostituiscono quelli attesi (adattamenti TEST)")
     a.add_argument("--etichetta", default="")
     x = a.parse_args()
 
     attesi = blob_del_riferimento(x.repo, x.ref, x.escludi, x.solo)
+    adattati = 0
+    if x.overlay:
+        pref = x.overlay.rstrip("/") + "/"
+        attesi = {p: h for p, h in attesi.items() if not p.startswith(pref)}
+        for p, h in blob_del_riferimento(x.repo, x.ref, [], [x.overlay]).items():
+            attesi[p[len(pref):]] = h
+            adattati += 1
     installati = hash_installati(x.dir, list(attesi), x.ssh)
     non_leggibili = sorted(p for p, h in installati.items() if h == "NONLEGGIBILE")
     installati = {p: h for p, h in installati.items() if h != "NONLEGGIBILE"}
@@ -115,7 +128,8 @@ def main():
     print(f"{etichetta}: confronto con {x.ref}: {uguali} uguali, "
           f"{len(solo_fine_riga)} uguali salvo fine riga CRLF, {len(diversi)} diversi, "
           f"{len(mancanti)} assenti nella cartella"
-          + (f", {len(non_leggibili)} NON LEGGIBILI" if non_leggibili else ""))
+          + (f", {len(non_leggibili)} NON LEGGIBILI" if non_leggibili else "")
+          + (f" (compresi {adattati} adattamenti TEST da {x.overlay})" if adattati else ""))
     for p in non_leggibili[: x.elenco]:
         print(f"  non leggibile: {p}")
     for p in diversi[: x.elenco]:
