@@ -203,6 +203,9 @@ diretto come `claude` con una chiave del PC, se preferito).
 | 5. `AGENTS.md` e procedura canonica | Fatto per CARMA e Delivery Planner |
 | 6. Collaudo | CARMA: TEST su `main` verde (20/11); rilascio reale `prod-20261120` in PRODUZIONE e DR il 20/11 alle 17:45, pianificato in assenza dell'utente, riuscito |
 
+Pulizia: versioni vecchie di Delivery Planner dopo ogni rilascio (ultime 3, `ops/sfoltisci.sh`); backup vecchi
+con `ops/backup-sfoltisci.sh` e timer settimanale (regole in `ops/sbin/README.md`, decisione del 24/11/2026).
+
 Migrazioni del database: le applica l'utente (decisione del 23/11/2026); gli script si fermano e poi
 proseguono con `--migrazioni-applicate`.
 

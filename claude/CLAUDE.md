@@ -29,4 +29,6 @@ regole-sviluppo, poi ricopiarlo in `~/.claude/CLAUDE.md`.
   `/rilascio` (dopo «approvo il rilascio di prod-AAAAMMGG»: merge, tag, PRODUZIONE, DR, scheda),
   `/dr` (solo DR, su richiesta).
 - Rilascio a un orario (ora italiana): `~/lavoro/regole-sviluppo/ops/rilascio-pianificato.sh pianifica|elenco|annulla`.
+- Backup vecchi: `~/lavoro/regole-sviluppo/ops/backup-sfoltisci.sh <test|prod> [--prova]` (regole in `ops/sbin/README.md`;
+  gira da solo la domenica alle 04:30). Le versioni vecchie di Delivery Planner: `ops/sfoltisci.sh` del progetto.
 - I server possono non essere in ora italiana: per gli orari all'utente usare sempre `TZ=Europe/Rome`.

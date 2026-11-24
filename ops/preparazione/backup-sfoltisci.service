@@ -1,0 +1,6 @@
+[Unit]
+Description=Pulizia settimanale dei backup vecchi (regole-sviluppo ops/sbin/backup-sfoltisci)
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/backup-sfoltisci
