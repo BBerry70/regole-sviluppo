@@ -22,6 +22,7 @@
       "Bash(gh release list*)",
       "Bash(gh release view*)",
       "Bash(*/ops/rilascio-pianificato.sh elenco*)",
+      "Bash(*/ops/backup-sfoltisci.sh * --prova)",
       "Bash(gh repo clone BBerry70/*)",
       "Bash(python3 -m pytest*)",
       "Bash(pytest*)",

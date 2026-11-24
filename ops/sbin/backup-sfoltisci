@@ -1,0 +1,76 @@
+#!/usr/bin/env bash
+# backup-sfoltisci [--prova] — cancella i backup vecchi su questo server (PRODUZIONE o TEST/DR).
+# Script privilegiato (regole-sviluppo ops/sbin/README.md): root:root 0755 in /usr/local/sbin, lanciato da
+# ops/backup-sfoltisci.sh con sudo (solo senza argomenti o con --prova) e dal timer settimanale.
+#
+# Cartelle: /opt/acrm/backups, /opt/test/acrm/backups, /opt/delivery-planner/backups,
+# /opt/test/delivery-planner/backups (quelle che esistono). Tocca SOLO due tipi di voce:
+#  1. backup dei rilasci claude-<ambiente>-AAAAMMGG-HHMMSS/ (cartelle): tiene i 3 più recenti per ambiente
+#     e quello citato da claude-<ambiente>-ultimo (serve al rollback);
+#  2. dump giornalieri acrm_dev_before_refresh_AAAAMMGG_HHMMSS.dump (file): tiene i 14 più recenti e il
+#     primo di ciascuno degli ultimi 6 mesi.
+# Tutto il resto (dump fatti a mano, deploy_*, backup PRIST, ...) non viene toccato.
+# --prova: elenca cosa cancellerebbe, senza cancellare.
+set -euo pipefail
+export LC_ALL=C PATH=/usr/sbin:/usr/bin:/sbin:/bin
+TIENI_RILASCI=3; TIENI_GIORNALIERI=14; TIENI_MESI=6
+CARTELLE=(/opt/acrm/backups /opt/test/acrm/backups /opt/delivery-planner/backups /opt/test/delivery-planner/backups)
+GIORNALIERO=acrm_dev_before_refresh_
+
+prova=0
+case "$#:${1:-}" in 0:) ;; 1:--prova) prova=1 ;; *) echo "uso: backup-sfoltisci [--prova]" >&2; exit 2 ;; esac
+[ "$(id -u)" = 0 ] || { echo "backup-sfoltisci: serve root (sudo)" >&2; exit 2; }
+exec 9>/run/lock/backup-sfoltisci.lock
+flock -n 9 || { echo "backup-sfoltisci: già in esecuzione" >&2; exit 1; }
+log() { printf '[%s] %s\n' "$(date +%H:%M:%S)" "$*"; }
+libero() { df -Pm "$1" | awk 'NR==2 {print $4}'; }
+elenca() {  # <cartella> <tipo find> <regex del nome> -> nomi in ordine decrescente (il nome contiene data e ora)
+  find "$1" -mindepth 1 -maxdepth 1 -type "$2" -regextype posix-extended -regex ".*/$3" -printf '%f\n' | sort -r
+}
+
+totale=0
+for d in "${CARTELLE[@]}"; do
+  [ -d "$d" ] && [ ! -L "$d" ] || continue
+  unset tieni; declare -A tieni=()
+  candidati=()
+
+  # 1. Backup dei rilasci, per ambiente
+  mapfile -t ambienti < <(elenca "$d" d 'claude-[a-z]+-[0-9]{8}-[0-9]{6}' | sed -E 's/^claude-([a-z]+)-.*/\1/' | sort -u)
+  for amb in "${ambienti[@]}"; do
+    mapfile -t el < <(elenca "$d" d "claude-$amb-[0-9]{8}-[0-9]{6}")
+    for i in "${!el[@]}"; do
+      if [ "$i" -lt "$TIENI_RILASCI" ]; then tieni["${el[$i]}"]=1; else candidati+=("${el[$i]}"); fi
+    done
+  done
+  for u in "$d"/claude-*-ultimo; do
+    [ -f "$u" ] && [ ! -L "$u" ] || continue
+    b="$(head -1 "$u")"; [ -n "$b" ] && tieni["$(basename "$b")"]=1
+  done
+
+  # 2. Dump giornalieri
+  mapfile -t gg < <(elenca "$d" f "${GIORNALIERO}[0-9]{8}_[0-9]{6}\.dump")
+  if [ "${#gg[@]}" -gt 0 ]; then
+    for i in "${!gg[@]}"; do [ "$i" -lt "$TIENI_GIORNALIERI" ] && tieni["${gg[$i]}"]=1; done
+    mapfile -t mesi < <(printf '%s\n' "${gg[@]}" | cut -c$(( ${#GIORNALIERO} + 1 ))-$(( ${#GIORNALIERO} + 6 )) | sort -ur | head -n "$TIENI_MESI")
+    for m in "${mesi[@]}"; do
+      tieni["$(printf '%s\n' "${gg[@]}" | grep "^$GIORNALIERO$m" | sort | head -1)"]=1
+    done
+    candidati+=("${gg[@]}")
+  fi
+
+  via=(); byte=0
+  for n in "${candidati[@]}"; do
+    [ -z "${tieni[$n]:-}" ] || continue
+    [ ! -L "$d/$n" ] || continue
+    via+=("$n"); byte=$(( byte + $(du -sb -- "$d/$n" | cut -f1) ))
+  done
+  if [ "${#via[@]}" -eq 0 ]; then log "$d: niente da cancellare"; continue; fi
+  log "$d: ${#via[@]} backup vecchi, $(( byte / 1048576 )) MB$([ "$prova" = 1 ] && echo ' (prova: nulla cancellato)')"
+  printf '    %s\n' "${via[@]}"
+  totale=$(( totale + ${#via[@]} ))
+  [ "$prova" = 0 ] || continue
+  prima="$(libero "$d")"
+  for n in "${via[@]}"; do rm -rf -- "${d:?}/$n"; done
+  log "$d: cancellati ${#via[@]}; spazio libero $prima -> $(libero "$d") MB"
+done
+log "fine: $totale backup vecchi $([ "$prova" = 1 ] && echo 'da cancellare' || echo 'cancellati')"

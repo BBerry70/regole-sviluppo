@@ -7,3 +7,6 @@ claude ALL=(root) NOPASSWD: /usr/local/sbin/carma-prod-rollback ""
 claude ALL=(root) NOPASSWD: /usr/local/sbin/dp-prod-rilascio ""
 claude ALL=(root) NOPASSWD: /usr/local/sbin/dp-prod-rollback ""
 claude ALL=(root) NOPASSWD: /usr/local/sbin/dp-prod-sfoltisci ""
+# Pulizia dei backup vecchi (regole-sviluppo ops/sbin/backup-sfoltisci): senza argomenti o solo --prova.
+claude ALL=(root) NOPASSWD: /usr/local/sbin/backup-sfoltisci ""
+claude ALL=(root) NOPASSWD: /usr/local/sbin/backup-sfoltisci --prova

@@ -1,5 +1,5 @@
 # /etc/sudoers.d/claude-ops — deroga D1 alla regola 8 (CLAUDE_CODE_SERVER_TEST.md §6.2).
-# Solo script root:root 0755 in /usr/local/sbin, per percorso assoluto, senza argomenti, senza caratteri jolly.
+# Solo script root:root 0755 in /usr/local/sbin, per percorso assoluto, senza argomenti (salvo --prova di backup-sfoltisci), senza caratteri jolly.
 # Ogni aggiunta passa da una PR approvata e da un'installazione fatta dall'utente con la propria password.
 claude ALL=(root) NOPASSWD: /usr/local/sbin/carma-test-riavvia ""
 claude ALL=(root) NOPASSWD: /usr/local/sbin/carma-dr-aggiorna ""
@@ -9,3 +9,6 @@ claude ALL=(root) NOPASSWD: /usr/local/sbin/dp-test-ripristina ""
 claude ALL=(root) NOPASSWD: /usr/local/sbin/dp-dr-aggiorna ""
 claude ALL=(root) NOPASSWD: /usr/local/sbin/dp-test-sfoltisci ""
 claude ALL=(root) NOPASSWD: /usr/local/sbin/dp-dr-sfoltisci ""
+# Pulizia dei backup vecchi (regole-sviluppo ops/sbin/backup-sfoltisci): senza argomenti o solo --prova.
+claude ALL=(root) NOPASSWD: /usr/local/sbin/backup-sfoltisci ""
+claude ALL=(root) NOPASSWD: /usr/local/sbin/backup-sfoltisci --prova
