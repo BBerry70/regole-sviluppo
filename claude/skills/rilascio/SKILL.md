@@ -13,7 +13,14 @@ per altre PR, altri tag o altri giorni. Senza la frase di approvazione: fermarsi
   o la data pianificata); se esiste già, `-2`, `-3`, … Se l'utente ha scritto un nome di tag, usare quello.
 - Orario: se l'utente indica un'ora («alle 17:45»), è ora italiana → rilascio pianificato (passo 4b).
 
+**Script del progetto.** Se il progetto ha `ops/pr-esamina.sh`, `ops/chiudi-pr.sh` e `ops/scheda-rilascio.sh`
+(oggi Delivery Planner), i passi 1, 2, 3 e 6 si fanno con quegli script e non a mano; altrimenti (CARMA) si
+seguono i passi come scritti. Gli script si rilanciano da soli con `sg dp-test` e salvano la loro uscita in
+`~/ops-registri/<progetto>/`.
+
 ## 1. Controlli prima del merge (sola lettura)
+Con gli script: `ops/pr-esamina.sh <n>` deve chiudere con «nessun blocco» (PR aperta e unibile, migrazioni,
+sintassi, TEST con lo stesso codice e ultima `ops/test-verifica.sh` VERDE registrata). Senza:
 - `gh pr view <n> --json state,mergeable,headRefOid,baseRefName,files`: aperta, verso `main`, senza conflitti.
 - Collaudo in TEST: `ops/test-verifica.sh` verde sullo stesso codice della PR (il commit applicato è in
   `<TEST_DIR>/.claude-applicato.json`). Per Delivery Planner comprende i controlli obbligatori di `AGENTS.md`
@@ -25,6 +32,9 @@ per altre PR, altri tag o altri giorni. Senza la frase di approvazione: fermarsi
   `docs/releases/<tema>/RELEASE.md` (Delivery Planner). Se manca, va bene: si crea al passo 6.
 
 ## 2. Merge e tag
+Con gli script: `ops/chiudi-pr.sh <n> --prova` (mostra il nome del tag), poi `ops/chiudi-pr.sh <n>` (o
+`--tag <nome>` se l'utente l'ha indicato): rifà i controlli, unisce, crea la release sul commit di merge, la
+verifica e riallinea e riverifica TEST (passo 3 compreso). Se termina con errore: fermarsi e riportare. Senza:
 1. `gh pr merge <n> --merge --delete-branch`, poi `git switch main && git pull --ff-only`.
 2. `gh release create <tag> --target <sha del commit di merge> --title "<tag> <descrizione breve>" --notes "<riassunto, link PR>"`.
 3. `git fetch --tags` e controllo: `git rev-parse <tag>^{commit}` = commit di merge, ed è l'ultimo tag `prod-*`.
@@ -62,6 +72,10 @@ si ferma. In quel caso: `ops/test-applica.sh main` e `ops/test-verifica.sh`, che
 - Rapporto all'utente: cosa è successo, cosa è stato rimesso, stato attuale.
 
 ## 6. Scheda di rilascio
+Con gli script: `ops/scheda-rilascio.sh <tag>` (prima `--prova` se serve vedere la sezione): scrive la sezione
+«Registro del rilascio» da registri e marcatori, aggiorna la riga «Stato» e apre la PR senza unirla. Poi, sul
+ramo della PR, compilare le righe rimaste «_da compilare_» (approvazione, prova funzionale in TEST, verifica
+operativa: esito, chi, quando). Senza script:
 Su un ramo `claude/registro-rilascio-<tag>-<AAAAMMGG>`, completare la scheda in `doc/releases/` (o
 `docs/releases/`): approvazione, tag e commit, file installati, backup e dimensione del dump, controlli,
 DR (backup e `ripristina.sh`), stato finale, eventuale rollback. Aprire la PR **senza unirla**.
